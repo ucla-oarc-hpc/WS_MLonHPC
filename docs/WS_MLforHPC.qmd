@@ -1,0 +1,1211 @@
+---
+title: "Harnessing the Power of HPC for Machine Learning"
+subtitle: "Tools and Techniques"
+author: "Charles Peterson"
+format: 
+  revealjs: 
+    transition: slide
+    theme: [custom.scss]
+    scrollable: true
+    self-contained: true
+from: markdown+emoji
+---
+
+## :wave: Welcome Everyone! :computer:
+
+::: {style="font-size: 0.80em" }
+
+This workshop provides an overview of topics and practical examples of using Machine Learning tools on HPC resources. :star:
+
+
+:::
+:::: {.columns .fragment}
+::: {.column width="60%"}
+::: {style="font-size: 0.80em" }
+
+:key: Key Topics:
+
+- Python/R in HPC (Hoffman2)
+- ML Package Installation
+- Interactive and Batch Job Submission
+- Big Data Insights
+
+For suggestions: [cpeterson\@oarc.ucla.edu](mailto:cpeterson@oarc.ucla.edu){.email}
+
+:::
+:::
+::: {.column width="40%"}
+::: {style="text-align: center"}
+
+<img src="fullpic.png"/ width="50%">
+
+:::
+:::
+::::
+
+## :open_book: Access the Workshop Files
+
+::: {style="font-size: 0.80em" }
+
+This presentation and accompanying materials are available on :link: [UCLA OARC GitHub Repository](https://github.com/ucla-oarc-hpc/WS_MLonHPC)
+
+You can view the slides in:
+
+- :page_facing_up: PDF format - WS_MLonHPC.pdf
+- :globe_with_meridians: HTML format: [Workshop Slides](https://ucla-oarc-hpc.github.io/WS_MLonHPC)
+
+Each file provides detailed instructions and examples on the various topics covered in this workshop.
+
+> **Note:** :hammer_and_wrench: This presentation was built using [Quarto](https://quarto.org/) and RStudio.
+
+:::
+
+# Machine and HPC
+
+## :bulb: Machine Learning Basics
+
+::: {style="font-size: 0.80em" }
+
+- What is Machine Learning?
+  - 🤖 **Machine Learning (ML)** is a subset of artificial intelligence (AI) focused on building systems that learn from and make decisions based on data.
+
+- Key Concepts:
+  - **Data:** The foundation of any ML model. It can be labeled (supervised learning) or unlabeled (unsupervised learning).
+  - **Algorithms:** Procedures or formulas for solving a problem. Common ML algorithms include linear regression, decision trees, and neural networks.
+  - **Training:** The process of teaching a machine learning model to make predictions or decisions based on data.
+  - **Inference:** Applying the trained model to new data to make predictions.
+
+- Types of Machine Learning:
+  - :mag: **Supervised Learning:** The model learns using labeled data (e.g., spam detection).
+  - :brain: **Unsupervised Learning:** The model identifies patterns in data without any labels (e.g., customer segmentation).
+  - :robot: **Reinforcement Learning:** The model learns to make decisions by performing actions and observing the results (e.g., robotics).
+
+- Why Machine Learning?
+  - :rocket: Automate decision-making processes.
+  - :mag: Discover insights and patterns in complex data.
+  - Enhance user experience and business intelligence.
+
+:::
+
+## :question: What is HPC and Why Should I Care
+
+- :rocket: HPC uses **MANY computers** to solve large problems faster than a normal computer.
+
+- :clock3: If your task takes a long time to run on a laptop or a lab's server, HPC can **'speed up'** your application.
+
+- :books: You can store **LARGE amounts of data**, too big for your laptop.
+
+## :globe_with_meridians: General vs High-Performance Computing
+
+:::: {.columns style="font-size: 0.75em" }
+::: {.column width="45%"}
+
+### General Purpose Computing
+
+- :information_desk_person: Only one person at a time.
+- :desktop_computer: Calculations run on the machine directly.
+- :abacus: Can only run 1-2 calculations at a time.
+
+:::
+::: {.column width="55%"}
+
+### High-Performance Computing
+
+- :busts_in_silhouette: Multiple people can log in at one time.
+- :stopwatch: Calculations are ‘scheduled’ to run on a different machine.
+- :computer: Can run hundreds of calculations at one time.
+
+:::
+::::
+
+:handshake: **HPC provides an excellent platform for collaborations and faster results.**
+
+
+## HPC Overview
+
+:::: {.columns  }
+::: {.column width="50%"}
+
+Beowulf style cluster
+
+</br>
+</br>
+
+**Multiple computers**
+
+**Single computing resource**
+
+:::
+::: {.column width="50%"}
+![](HPCpic.png)
+:::
+::::
+
+## :zap: The Power of HPC
+
+::: { style="font-size: 0.85em" }
+:::: {.columns}
+::: {.column width="50%"}
+
+### Single Computer Limitations:
+- :brain: Only one CPU.
+- :construction: Large problems cannot fit.
+- :hourglass_flowing_sand: Long processing times.
+- :chart_with_downwards_trend: Limited memory and disk space.
+
+:::
+::: {.column width="50%"}
+
+### HPC Solutions:
+- ️:desktop_computer:  **More CPUs** for faster processing.
+- :chart_with_upwards_trend: **More memory** to handle bigger tasks.
+- :floppy_disk: **More disk space** for extensive data.
+- :video_game: **Access to GPUs** for advanced computations.
+
+:::
+::::
+:::
+
+## :muscle: The Power of HPC: Parallelization
+
+:::: {.columns}
+::: {.column width="50%"}
+### Single CPU Program
+- Task A :arrow_right: Task B :arrow_right: Task C 
+- :clock3: Total Time: 3 hours
+
+:::
+::: {.column width="50%"}
+### Parallel Tasks
+- Task A on CPU 1 :clock3: 1 hour
+- Task B on CPU 2 :clock3: 1 hour
+- Task C on CPU 3 :clock3: 1 hour
+- :zap: Total Time: 1 hour
+
+:::
+::::
+
+🤖 Most Machine Learning packages can utilize multiple CPUs and GPUs to run your models in parallel!
+
+
+## Multi-tasking with Machine Learning Jobs
+
+:::: {.columns}
+::: {.column width="60%" style="font-size: 0.85em"}
+
+- :rocket: With HPC resources, you can have **multiple machine learning jobs running concurrently**.
+- :chart_with_upwards_trend: This parallel processing greatly increases efficiency and productivity.
+- :globe_with_meridians: Ideal for complex computations and large-scale data analysis.
+:::
+::: {.column width="40%"}
+![](queue.png){width=90%}
+:::
+::::
+
+## :snake: Python
+
+::: {style="font-size: 0.70em" }
+
+Hoffman2 supports running :snake: Python applications. 
+
+Hoffman2 supports :snake: Python applications, and it is **HIGHLY** recommended to use Python versions built and tested by Hoffman2 staff.
+
+:no_entry_sign: Avoid using system python builds (e.g., `/usr/bin/python`). Instead, use `module load` commands to access optimized versions.
+
+- To see all Python versions installed on Hoffman2:
+
+```{.bash}
+modules_lookup -m python
+```
+
+- Load a Python module
+
+```{.bash}
+module load python/3.7.3
+which python3
+```
+
+- This example shown: 
+  - Python version 3.7.3 
+  - Location of python
+    - `/u/local/apps/python/3.7.3/gcc-4.8.5/bin/python3`
+    -  (Location of the Hoffman2 installed python)
+
+:::
+
+## :snake: Python Packages in Machine Learning
+
+::: {style="font-size: 0.70em" }
+
+### :gear: Scikit-learn:
+- Versatile tools for machine learning, including classification, regression, and clustering.
+
+### :orange_circle: TensorFlow:
+- Google's library for deep learning and neural networks.
+
+### :blue_heart: Keras:
+- Python interface for neural networks, primarily an interface for TensorFlow.
+
+### :fire: PyTorch:
+- Flexible deep learning library by Facebook's AI Research lab.
+
+### :chart_with_upwards_trend: XGBoost:
+- Efficient gradient boosting library, ideal for structured data.
+
+### :bar_chart: Pandas:
+- Essential for data manipulation and analysis, a cornerstone in machine learning.
+
+### :heavy_plus_sign: NumPy:
+- Fundamental for scientific computing, supports large arrays and matrices.
+
+### :microscope: SciPy:
+- For scientific and technical computing, extends NumPy's capabilities.
+
+:::
+
+## :snake: Python Installation on Hoffman2
+
+::: {style="font-size: 0.70em" }
+
+**Basic Builds on Hoffman2:**
+- The Python builds on Hoffman2 include only the basic compiler/interpreter and a few essential packages.
+
+### User-Installed Packages:
+- :package: Most Machine Learning Python applications will require additional packages, installed by the user.
+- :no_entry_sign: Hoffman2 staff do **not** install extra packages in the supported Python builds to avoid conflicts.
+
+### Installing Machine Learning Packages:
+- :star: When using Python/R, you'll need to install the Machine Learning packages yourself.
+- :books: We have a workshop covering this topic in detail:
+  - :link: [Python/R Installation Workshop](https://github.com/ucla-oarc-hpc/H2HH_Python-R)
+
+:::
+
+
+
+## :wrench: User-Installed Packages on Hoffman2
+
+::: {style="font-size: 0.65em" }
+
+- :no_entry_sign: Users cannot install packages in the main Python build directories.
+  - :no_pedestrains: This is to avoid version conflicts and dependencies issues that could break Python.
+
+- :bust_in_silhouette: Users can install packages in their own directories:
+  - `$HOME`, `$SCRATCH`, or any project directories.
+
+Installation Methods:
+
+- ️:wrench: **Using pip package manager:** Ideal for standard Python package installations.
+- :globe_with_meridians: **Using Python Virtual Environments:** Creates isolated environments for specific projects.
+- :snake: **Using Anaconda:** Suitable for managing complex package dependencies and environments.
+
+:::
+
+## :package: Using pip Package Manager
+
+::: {style="font-size: 0.80em" }
+
+### Installing scikit-learn with pip:
+- To install the `scikit-learn` package via pip (PyPI) package manager:
+
+```{.bash}
+module load python/3.7.3
+pip3 install scikit-learn --user
+```
+
+Understanding the --user Flag:
+
+- :house: The `--user` flag ensures the package installs in your $HOME directory.
+- :no_entry_sign: By default, pip tries to install in the main Python build directory, where users lack write access.
+- :file_folder: Using `--user`, packages install in $HOME/.local, avoiding permission errors.
+:::
+
+## :bar_chart: R on Hoffman2
+
+::: {style="font-size: 0.75em" }
+
+Finding Available Versions of R:
+
+- :star: Hoffman2 supports various versions of R.
+- To view all available versions of R on Hoffman2:
+
+```{.bash}
+modules_lookup -m R
+```
+
+Loading a Specific Version of R:
+Example to load R version 4.2.2 with GCC version 10.2.0:
+
+```{.bash}
+module load gcc/10.2.0
+module load R/4.2.2
+```
+
+Ensuring Correct Module Loads:
+
+-:wrench: Load the gcc or intel modules first, as indicated by `modules_lookup`.
+This step ensures that the correct versions of gcc and intel libraries are loaded for R.
+:::
+
+## :bar_chart: R Packages
+
+::: {style="font-size: 0.70em" }
+
+### :gear: Caret:
+- Framework for building machine learning models. Offers tools for data pre-processing, feature selection, and model tuning.
+
+### 🌲 RandomForest:
+- Implements the random forest algorithm. Known for performance in classification and regression.
+
+### 🔍 e1071:
+- Contains functions for SVMs, naive Bayes classifier, and more.
+
+### 🧠 nnet:
+- For training single-hidden-layer neural networks and multinomial log-linear models.
+
+### 🌳 rpart:
+- Recursive partitioning for decision tree models.
+
+### :chart_with_upwards_trend: xgboost:
+- Efficient gradient boosting, effective for large datasets.
+
+### 🔗 glmnet:
+- Fitting generalized linear and Cox models via penalized likelihood.
+
+### 📜 tm:
+- Text mining framework, managing and mining text data.
+
+### 🎨 ggplot2:
+- Powerful data visualization tool based on the Grammar of Graphics.
+
+### 🔢 dplyr:
+- Essential for data manipulation, providing a set of tools for dataset management.
+
+:::
+
+## :package: R Package Installation
+
+::: {style="font-size: 0.75em" }
+
+Standard Installation Command:
+
+- Use the following command to install R packages:
+
+```{.bash}
+install.packages('PKG_name')
+```
+
+- :no_entry_sign: On Hoffman2 (and most other HPC resources), you cannot modify the main R global directory.
+- Example Installation:
+
+```{.bash}
+install.packages("dplyr")
+```
+
+- :house: R will suggest a new path in your $HOME directory, determined by $R_LIBS_USER.
+
+- Each R module on Hoffman2 has a unique $R_LIBS_USER to prevent conflicts between different R versions.
+
+:::
+
+## :snake: Anaconda
+
+::: {style="font-size: 0.70em" }
+
+Anaconda is a popular Python and R distribution, ideal for simplifying package management and pipelines. 
+
+Hoffman2 has Anaconda installed, allowing users to create their own conda environments.
+
+```{.bash}
+module load anaconda3
+```
+
+::: {.callout-warning}
+
+:no_entry_sign: No Need for Other Python/R Modules:
+
+- Your Anaconda environment includes a build of Python and/or R. Loading other modules may cause conflicts.
+
+:::
+::: {.callout-note}
+
+For more information, we had done a workshop on using [Anaconda on Hoffman2](https://github.com/ucla-oarc-hpc/H2HH_anaconda) that you can review.
+
+:::
+:::
+
+
+## :package: Containers
+
+::: {style="font-size: 0.70em" }
+
+Containers, like Apptainer and Docker, are excellent for running Machine Learning applications on Hoffman2. 
+
+### Advantages of Containers:
+- :building_construction: **Isolated Environments:** Comes with all necessary Machine Learning software pre-installed.
+- :truck: **Portability:** Use the same container on different computers, ensuring version control and reproducibility.
+
+### Apptainer on Hoffman2:
+- :wrench: Hoffman2 uses Apptainer for running containers.
+- :mag: For more information, refer to our previous workshop:
+  - :link: [Containers Workshop](https://github.com/ucla-oarc-hpc/WS_containers)
+
+:::
+
+# Example: Fashion MNIST
+
+## :dress: Fashion MNIST
+
+::: {style="font-size: 0.60em" }
+
+This example focuses on the "Fashion MNIST" dataset, a collection used frequently in machine learning for image recognition tasks.
+
+Approach:
+
+- :evergreen_tree: We will use a Random Forest algorithm to train a model for predicting fashion categories.
+
+Dataset Overview:
+
+- :camera_flash: **Images:** 28x28 grayscale images of fashion products.
+- :bar_chart: **Categories:** 10, with 7,000 images per category.
+- :abacus: **Total Images:** 70,000.
+
+![](mnist.png){width=60%}
+
+:::
+
+## :microscope: ML Packages for Python and R
+
+::: {style="font-size: 0.60em" }
+
+Using Scikit-learn with Python:
+
+- :robot: Ideal for algorithms like classification and clustering.
+- :jigsaw: Useful for preprocessing, model building, and evaluation.
+
+Package Installation:
+
+Python:
+
+- Install Python and Scikit-learn:
+
+```{.bash}
+module load python/3.9.6
+pip3 install sklearn --user
+```
+
+R:
+
+- Install R and necessary packages:
+
+```{.bash}
+module load gcc/10.2.0
+module load R/4.2.2
+# Needed for OpenML package
+module load libxml2
+R -e 'install.packages(c("randomForest", "OpenML", "dplyr", "ggplot2", "caret", "farff"), repos = "https://cran.r-project.org/")'
+```
+
+:::
+
+## Python Example Run
+
+::: {style="font-size: 0.65em" }
+
+Getting Started with Interactive Compute Node
+
+- Start by requesting an interactive compute node:
+
+```{.bash}
+qrsh -l h_data=10G
+```
+
+Cloning and Navigating to the Code Repository
+
+- Clone the repository and navigate to the mnist-ex directory:
+
+```{.bash}
+cd $SCRATCH
+git clone https://github.com/ucla-oarc-hpc/WS_MLonHPC
+cd WS_MLonHPC/mnist-ex
+```
+
+Lets look at the code, `minst.py`
+
+Running the Python Script:
+
+- Load Python module and run the mnist.py script:
+
+```{.bash}
+module load python/3.9.6
+python3 mnist.py
+```
+
+:::
+
+## :twisted_rightwards_arrows: Parallel Processing with Python 
+
+::: {style="font-size: 0.60em" }
+
+The initial training took about 1 minute over 1 CPU core.
+
+Speeding Up with Parallel Processing:
+
+- Request 10 cores for parallel processing:
+
+```{.bash}
+qrsh -l h_data=10G -pe shared 10
+```
+
+Note: Use the shared parallel environment as sci-kit learn doesn't support multi-node parallelism.
+
+Code Adjustment for Parallelism:
+
+- Lets look at the code, `minst-par.py`
+- The main change is n_jobs option in the Classifier
+
+```{.bash}
+clf = RandomForestClassifier(random_state=42, n_jobs=10)
+```
+
+Run the code!
+
+```{.bash}
+module load python/3.9.6
+python3 mnist.py
+```
+
+:::
+
+## :clipboard: Batch Submission on Hoffman2
+
+::: {style="font-size: 0.90em" }
+
+Submitting Non-Interactive Jobs:
+- For tasks that don't require interactive sessions, you can submit jobs to be processed in the background.
+
+Command to Submit a Job:
+- Use the `qsub` command to submit your job script to the queue:
+
+```{.bash}
+qsub mnist-par.job
+```
+
+Advantages:
+
+- :rocket: Efficient for longer or resource-intensive tasks.
+- :clock3: Allows you to free up your session while the job runs in the background.
+
+:::
+
+## :bar_chart: Running R 
+
+::: {style="font-size: 0.80em" }
+
+Executing Code with a Single CPU:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Start with requesting an interactive compute node:
+:::
+::: {.column width="50%"}
+```{.bash}
+qrsh -l h_data=10G
+module load gcc/10.2.0
+module load R/4.2.2
+Rscript mnist.R
+```
+
+:::
+::::
+Running Code with Parallel Processing (10 CPUs):
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Request multiple cores for parallel execution:
+:::
+::: {.column width="50%"}
+```{.bash}
+qrsh -l h_data=10G -pe shared 10
+module load gcc/10.2.0
+module load R/4.2.2
+Rscript mnist-par.R
+```
+
+:::
+::::
+
+Submitting as a Batch Job:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- For non-interactive execution, submit the job script:
+:::
+::: {.column width="50%"}
+```{.bash}
+qsub mnist-par.job
+```
+
+:::
+::::
+:::
+
+# Example: DNA Sequence
+
+## DNA Sequence classification
+
+::: { style="font-size: 0.75em"}
+:::: {.columns}
+::: {.column width="70%"}
+
+:dna: DNA Sequence Classification with PyTorch
+
+- :dna: **Objective:** Create a model to classify DNA sequences into 'gene' or 'non-gene' regions.
+- **Gene Regions:** Segments of DNA containing codes for protein production.
+- **Dataset Creation:** Generate random DNA sequences labeled as 'gene' or 'non-gene'.
+
+
+:::
+::: {.column width="30%"}
+<img src="DNA.png" alt="DNA Illustration">
+:::
+::::
+- :robot: **Model Development:** Use PyTorch to build a model predicting the presence of 'gene' regions.
+- :rocket: **Leveraging GPUs:** Utilize the parallel processing power of GPUs for efficient training.
+:::
+
+## :snake: Creating a Conda Environment
+
+::: { style="font-size: 0.75em"}
+
+Setting Up for GPU-Enabled PyTorch:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Begin by loading the Anaconda module:
+
+:::
+::: {.column width="50%"}
+
+```{.bash}
+module load anaconda3
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%"}
+
+- Create a new Conda environment named biotest with Python, scikit-learn, and scipy:
+
+:::
+::: {.column width="50%"}
+
+```{.bash}
+conda create -n biotest python=3.11 scikit-learn scipy -c conda-forge -y
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%"}
+
+- Activate the newly created environment:
+
+:::
+::: {.column width="50%"}
+
+```{.bash}
+conda activate biotest
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%"}
+
+- Install PyTorch with GPU support using pip:
+
+:::
+::: {.column width="50%"}
+
+```{.bash}
+pip3 install torch
+```
+
+:::
+::::
+:::
+
+## :dna: Running PyTorch on Hoffman2
+
+::: { style="font-size: 0.75em"}
+
+Code Location and Versions:
+
+- The code for this task is located in the `dna-ex` directory.
+- There are two versions:
+  - :computer: `dna-cpu.py` for the CPU version.
+  - :video_game: `dna-gpu.py` for the GPU version.
+
+### Executing the Examples:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Request a node with GPU resources:
+
+:::
+::: {.column width="50%"}
+```{.bash}
+qrsh -l h_data=10G,gpu,A100 
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%"}
+
+- Run CPU version
+
+:::
+::: {.column width="50%"}
+```{.bash}
+conda activate biotest
+python3 dna-cpu.py
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%"}
+
+- Run GPU version 
+
+:::
+::: {.column width="50%"}
+
+```{.bash}
+python3 dna-gpu.py
+```
+
+:::
+::::
+:::
+
+# Understanding Big Data
+
+## :boom: Big Data
+
+::: { style="font-size: 0.70em"}
+
+The term **Big Data** refers to datasets and data science tasks that become too large and complex for traditional techniques.
+
+- For comprehensive information, check our workshop on [Big Data on HPC](https://github.com/ucla-oarc-hpc/WS_BigDataOnHPC)
+
+::: {style="text-align: center"}
+<img src="catsbigdata.png" width="80%"/>
+:::
+:::
+
+## :hammer_and_wrench: Big Data Tools
+
+::: { style="font-size: 0.90em"}
+
+Explore various frameworks, APIs, and libraries for handling Big Data 
+
+:::
+
+![](sparklogo.png){.absolute top=200 left=0 width="350" height="200"}
+![](dasklogo.jpeg){.absolute top=170 right=50 width="450" height="250"}
+![](h2ologo.jpg){.absolute bottom=20 right=400 width="300" height="200"}
+![](vaexlogo.png){.absolute bottom=0 right=20 width="300" height="100"}
+![](rapidslogo.png){.absolute bottom=0 left=20 width="300" height="300"}
+![](hadooplogo.png){.absolute bottom=150 right=20 width="300" height="100"}
+
+## :construction: Challenges with LOTS of Data
+
+::: {style="font-size: 0.75em"}
+Dealing with extensive **DATA** presents unique challenges 😰:
+:::
+::: {style="font-size: 0.65em"}
+::: {.fragment}
+- :brain: **Insufficient RAM:** Struggling to accommodate large datasets.
+:::
+
+::: {.fragment}
+- :hourglass_flowing_sand: **Time-Consuming Processing:**
+    - Difficulty in managing large datasets with traditional techniques.
+    - Prolonged computation times.
+:::
+
+::: {.fragment}
+- :robot: **Complex Machine Learning Models:**
+    - Training advanced models requires significant computational power for accuracy.
+:::
+
+::: {.fragment}
+- :robot: **Solution: High-Performance Computing (HPC)**
+  - HPC resources supercharge solving Big Data challenges with superior computing power :muscle:
+  - Many Big Data tools are designed to run efficiently across multiple compute nodes in HPC systems.
+
+:::
+:::
+
+## :construction: Big Data Challenges
+
+:::: {.columns}
+
+:::{ .column style="text-align: center" }
+
+<img src="dimensions_of_scale.svg" width="100%" />
+
+:::
+::: {.column style="font-size: 0.90em"}
+
+- **Scaling Data Size** :chart_with_upwards_trend:
+    - Datasets can become so large that they can't fit into RAM :scream:
+
+- **Scaling Model/Task Size** :robot:
+    - Machine Learning or other tasks become so complex that a single CPU core is not adequate :snail:
+
+:::
+::::
+
+::: footer
+Image source - DASK <https://ml.dask.org/index.html>
+:::
+
+# Example: Million Song Dataset
+
+## Million Song Example
+
+::: {style="font-size: 0.80em"}
+
+Using Spark's MLlib for Music Data Analysis:
+
+- This example utilizes Spark's Machine Learning library (MLlib).
+- We will analyze data from the [Million Song Subset](http://millionsongdataset.com/).
+
+Dataset Characteristics:
+
+- :musical_note: The subset contains approximately 500,000 songs.
+- :bar_chart: Features include:
+  - Year of the song.
+  - 90 features related to the timbre average and covariance.
+
+:::
+
+## :wrench: Installing Spark and PySpark
+
+::: { style="font-size: 0.75em"}
+
+Creating and Activating the Conda Environment:
+
+- Load Anaconda and create a new environment named `mypyspark`:
+- Installing Spark
+
+```{.bash}
+module load anaconda3
+conda create -n mypyspark openjdk pyspark python \
+                          pyspark=3.3.0 py4j jupyterlab findspark \
+                          h5py pytables pandas matplotlib \
+                          -c conda-forge -c anaconda -y
+conda activate mypyspark
+pip install ipykernel
+ipython kernel install --user --name=mypyspark
+```
+
+Environment Features:
+
+- :books: This Conda environment, mypyspark, is configured with Jupyter.
+- :rocket: It includes both Spark and PySpark, ready for big data processing tasks.
+
+:::
+
+## PySpark: Basic Operations :clipboard:
+
+::: {style="font-size: 0.80em"}
+
+Let's practice basic PySpark functions with examples.
+
+- Download the workshop content from the GitHub repository
+- We'll work with a Jupyter Notebook: Spark_basics.ipynb
+- Jupyter Notebook: `MSD.ipynb` from `MSD_ex`
+
+```{.bash}
+cd $SCRATCH
+git clone https://github.com/ucla-oarc-hpc/WS_MLOnHPC
+cd WS_MLonHPC/MSD_ex
+```
+
+Downloading the Dataset:
+
+- Retrieve the dataset to your workspace:
+
+```{.bash}
+cd $SCRATCH/WS_MLonHPC/MSD-ex
+wget https://archive.ics.uci.edu/ml/machine-learning-databases/00203/YearPredictionMSD.txt.zip
+unzip YearPredictionMSD.txt.zip
+```
+
+:::
+
+## PySpark: Basic operations: Starting the notebook
+
+::: {style="font-size: 0.65em"}
+
+We will use the `h2jupynb` script to start Jupyter on Hoffman2
+
+You will run this on your LOCAL computer.
+
+```{.bash}
+wget https://raw.githubusercontent.com/rdauria/jupyter-notebook/main/h2jupynb
+chmod +x h2jupynb
+
+#Replace 'joebruin' with you user name for Hoffman2
+#You may need to enter your Hoffman2 password twice 
+
+python3 ./h2jupynb -u joebruin -t 5 -m 10 -e 2 -s 1 -a intel-gold\\* \
+                    -x yes -d /SCRATCH/PATH/WS_MLonHPC/MSD_ex
+```
+
+:::{.callout-note}
+
+The `-d` option in the `python3 ./h2jupynb` will need to have the `$SCRATCH/WS_MLonHPC` full PATH directory
+:::
+
+This will start a Jupyter session on Hoffman2 with ONE entire intel-gold compute node (36 cores)
+
+More information on the `h2jupynb` can be found on the [Hoffman2 website](<https://www.hoffman2.idre.ucla.edu/Using-H2/Connecting/Connecting.html#connecting-via-jupyter-notebook-lab)
+
+:::
+
+# AutoML with H2O.ai
+
+## Introduction to AutoML
+
+::: {style="font-size: 0.65em"}
+
+AutoML, or Automated Machine Learning, is an innovative approach to automating the process of applying machine learning to real-world problems.
+
+:::: {.columns}
+:::{ .column }
+Key Benefits
+
+- **Efficiency:** Streamlines the model development process.
+- **Accessibility:** Makes ML more accessible to non-experts.
+- **Optimization:** Automatically selects the best models and parameters.
+
+:::
+:::{ .column }
+Components of AutoML
+
+- **Data Preprocessing:** Automatic handling of missing values, encoding, and normalization.
+- **Feature Engineering:** Automated feature selection and creation.
+- **Model Selection:** Choosing the best model from a range of algorithms.
+- **Hyperparameter Tuning:** Optimizing parameters for peak performance.
+- **Model Validation:** Ensuring robustness through cross-validation.
+
+:::
+::::
+:::
+
+## AutoML Tools
+
+::: {style="font-size: 0.65em" }
+
+HPC resouces can be use to echance AutoML since it can be very computationally demanding
+
+:::: {.columns}
+::: {.column width="70%" }
+
+**H2O.ai AutoML**: An open-source platform that automates the process of training and tuning a large selection of candidate models within H2O, a popular machine learning framework.
+:::
+::: {.column width="30%"}
+![](h2ologo.jpg)
+:::
+::::
+
+:::: {.columns}
+::: {.column width="70%" }
+**Auto-sklearn**: An automated machine learning toolkit based on the scikit-learn library, focusing on automating the machine learning pipeline, including preprocessing, feature selection, and model selection.
+:::
+::: {.column width="30%"}
+![](autosklearn.jpeg)
+:::
+::::
+:::: {.columns}
+::: {.column width="70%" }
+**TPOT** (Tree-based Pipeline Optimization Tool): An open-source Python tool that uses genetic algorithms to optimize machine learning pipelines.
+:::
+::: {.column width="30%"}
+![](tpot-logo.jpg)
+:::
+::::
+:::: {.columns}
+::: {.column width="70%" }
+**MLBox**: A powerful Automated Machine Learning python library that provides robust preprocessing, feature selection, and model tuning capabilities.
+:::
+::: {.column width="30%"}
+![](mlbox.png)
+:::
+::::
+:::: {.columns}
+::: {.column width="70%" }
+**Auto-Keras**: Auto-Keras is a AutoML program built on the Keras platform. 
+:::
+::: {.column width="30%"}
+![](autokeras.svg)
+:::
+::::
+:::
+
+## :droplet: Using H2O.ai for AutoML
+
+::: {style="font-size: 0.75em" }
+
+Setting Up H2O.ai for Automated Machine Learning:
+
+:::: {.columns}
+::: {.column width="50%" }
+- Start by loading Anaconda and creating a new environment named `h2oai`:
+
+:::
+::: {.column width="50%" }
+
+```{.bash}
+module load anaconda3
+conda create -n h2oai python matplotlib -c conda-forge -y
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%" }
+
+- Activate the newly created environment:
+
+:::
+::: {.column width="50%" }
+
+```{.bash}
+conda activate h2oai
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%" }
+
+- Install essential packages including H2O:
+
+:::
+::: {.column width="50%" }
+
+```{.bash}
+pip install requests tabulate future h2o
+```
+
+:::
+::::
+:::: {.columns}
+::: {.column width="50%" }
+
+- Install IPython kernel and configure it for the h2oai environment:
+
+:::
+::: {.column width="50%" }
+
+```{.bash}
+pip install ipykernel
+ipython kernel install --user --name=h2oai
+```
+
+:::
+::::
+
+:rocket: Your environment is now set up with H2O.ai, ready for AutoML tasks.
+
+:::
+
+## :droplet: H2O AutoML Example
+
+::: {style="font-size: 0.70em" }
+
+Exploring AutoML with H2O:
+
+:::: {.columns}
+::: {.column width="50%" }
+
+- We will work through an AutoML example from [H2o-tutorials](https://github.com/h2oai/h2o-tutorials).
+- The focus is on the [Combined Cycle Power Plant dataset](https://archive.ics.uci.edu/dataset/294/combined+cycle+power+plant).
+- :star: **Objective:** Predict the energy output of a Power Plant using temperature, pressure, humidity, and exhaust vacuum values.
+- This example, we will use the Python API, but H2O.ai has a R API as well
+:::
+::: {.column width="50%" }
+![](powerplant.png){width=90%}
+:::
+::::
+:::
+
+## Accessing the Notebook:
+
+::: {style="font-size: 0.90em" }
+
+- The Jupyter notebook for this example is in the `automl-ex` directory.
+- To start Jupyter, execute the following command, adjusting the path as necessary:
+
+```{.bash}
+python3 ./h2jupynb -u joebruin -t 5 -m 50 -e 2 -s 1 -a intel-gold\\* \
+                    -x yes -d /SCRATCH/PATH/WS_MLonHPC/automl-ex
+```
+
+:::
+
+# Wrap-up
+
+## :star2: Workshop Highlights
+
+::: {style="font-size: 0.80em" }
+
+- High-Performance Computing (HPC) and Machine Learning:
+  - :rocket: Introduction to HPC and its benefits for Machine Learning.
+  - :snake: Utilizing Python and R on HPC for advanced data processing.
+
+- Key Tools and Frameworks:
+  - :package: Installation and usage of vital Python packages like Scikit-learn, PyTorch.
+  - :bar_chart: R package installation and management in HPC environment.
+  - :snake: Setting up Anaconda environments for Python and machine learning libraries.
+
+- Big Data and Its Challenges:
+  - :boom: Understanding Big Data, its challenges, and tools to handle large datasets.
+  - :hammer_and_wrench: Introduction to various Big Data frameworks and libraries.
+
+- Conclusion:
+  - This workshop offered a comprehensive overview of leveraging HPC resources for Machine Learning and Big Data tasks.
+  - :books: For more detailed information, visit our [GitHub repositories and workshop materials](https://github.com/ucla-oarc-hpc).
+
+:::
+
+## :clap: Thanks for Joining! :heart:
+
+::: { style="font-size: 0.60em" }
+
+Questions? Comments?
+
+- [cpeterson\@oarc.ucla.edu](mailto:cpeterson@oarc.ucla.edu){.email}
+
+- Look at for more [Hoffman2 workshops](https://idre.ucla.edu/calendar)
+
+
+:::{ style="text-align: center" }
+
+<img src="padfoot.jpeg"/ width="40%" height="40%">
+
+:::
+:::
